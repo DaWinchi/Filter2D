@@ -11,6 +11,7 @@ class CModelDraw : public CStatic
 
 public:
 	double xmin, xmax, ymin, ymax;
+	int *_R;
 	std::vector<std::vector<double>>* _image;
 	
 	CModelDraw();

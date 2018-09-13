@@ -28,27 +28,20 @@ void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 	Graphics gr(RECT->hDC);
 	Bitmap bmp(RECT->rcItem.right, RECT->rcItem.bottom, &gr);
 	Graphics grBmp(&bmp);
-	
-	Pen penGlobRect(Color::White, 3);
-	SolidBrush brushCathodRect(Color::Blue);
-	SolidBrush brushAnodRect(Color::Red);
-	SolidBrush brushConductorRect(Color::DarkKhaki);
-	SolidBrush brushPoints(Color::Yellow);
-	
+	grBmp.SetSmoothingMode(SmoothingModeHighSpeed);
 	grBmp.Clear(Color::White);
 	
 	if (_image!=nullptr)
 	{
-
 		size_t width = _image[0][0].size();
 		size_t height = _image->size();
 		xmin = 0;
 		xmax = width;
 		ymin = 0;
 		ymax = height;
-		for (size_t i = 0; i < height; i++)
+		for (int i = 0; i < height; i++)
 		{
-			for (size_t j = 0; j < width; j++)
+			for (int j = 0; j < width; j++)
 			{
 				double val = _image[0][i][j];
 				Color color;
@@ -57,6 +50,13 @@ void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 				grBmp.FillRectangle(&brush, X(RECT, j), Y(RECT, i), Width(RECT, 1), Height(RECT, 1));
 			}
 		}
+	}
+
+	if (_R != nullptr)
+	{
+		Pen pen(Color::Red, 2);
+		grBmp.DrawEllipse(&pen, X(RECT, xmax / 2.f - (double)*_R), Y(RECT, ymax / 2.f + (double)*_R),
+			Width(RECT, (float)*_R*2.f), Height(RECT, (float)*_R*2.f));
 	}
 	gr.DrawImage(&bmp, 0, 0);
 }
