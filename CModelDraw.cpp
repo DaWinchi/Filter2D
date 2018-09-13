@@ -39,8 +39,13 @@ void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 	
 	if (_image!=nullptr)
 	{
+
 		size_t width = _image[0][0].size();
 		size_t height = _image->size();
+		xmin = 0;
+		xmax = width;
+		ymin = 0;
+		ymax = height;
 		for (size_t i = 0; i < height; i++)
 		{
 			for (size_t j = 0; j < width; j++)
