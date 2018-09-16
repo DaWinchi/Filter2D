@@ -13,7 +13,8 @@ public:
 	double xmin, xmax, ymin, ymax;
 	int *_R;
 	std::vector<std::vector<double>>* _image;
-	
+	bool _isSpectr, _ellipseDrawing;
+	Bitmap *_bmpSpect;
 	CModelDraw();
 	~CModelDraw();
 	virtual void DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct);

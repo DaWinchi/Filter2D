@@ -13,6 +13,7 @@ CModelDraw::CModelDraw()
 	{
 		MessageBox(L"ERROR!!!", L"Îøèáêà", MB_ICONERROR);
 	}
+	_isSpectr = _ellipseDrawing = false;
 }
 
 
@@ -24,14 +25,12 @@ CModelDraw::~CModelDraw()
 
 void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 {
-	
 	Graphics gr(RECT->hDC);
 	Bitmap bmp(RECT->rcItem.right, RECT->rcItem.bottom, &gr);
 	Graphics grBmp(&bmp);
-	grBmp.SetSmoothingMode(SmoothingModeHighSpeed);
 	grBmp.Clear(Color::White);
-	
-	if (_image!=nullptr)
+
+	if (_image != nullptr && !_ellipseDrawing)
 	{
 		size_t width = _image[0][0].size();
 		size_t height = _image->size();
@@ -51,15 +50,21 @@ void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 				grBmp.FillRectangle(&brush, X(RECT, j), Y(RECT, i), Width(RECT, 1), Height(RECT, 1));
 			}
 		}
+
+		_bmpSpect = bmp.Clone(0, 0, bmp.GetWidth(), bmp.GetHeight(), PixelFormatDontCare);
+		gr.DrawImage(&bmp, 0, 0);
 	}
 
-	if (_R != nullptr)
+	if (_R != nullptr && _ellipseDrawing)
 	{
+		Bitmap *bmpR= _bmpSpect->Clone(0, 0, _bmpSpect->GetWidth(), _bmpSpect->GetHeight(), PixelFormatDontCare);
+		Graphics grBmpR(bmpR);
 		Pen pen(Color::Red, 2);
-		grBmp.DrawEllipse(&pen, X(RECT, xmax / 2.f - (double)*_R), Y(RECT, ymax / 2.f + (double)*_R),
+		grBmpR.DrawEllipse(&pen, X(RECT, xmax / 2.f - (double)*_R+0.5), Y(RECT, ymax / 2.f + (double)*_R-0.5),
 			Width(RECT, (float)*_R*2.f), Height(RECT, (float)*_R*2.f));
+		gr.DrawImage(bmpR, 0, 0);
 	}
-	gr.DrawImage(&bmp, 0, 0);
+	
 }
 
 
