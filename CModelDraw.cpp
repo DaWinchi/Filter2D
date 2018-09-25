@@ -26,10 +26,6 @@ CModelDraw::~CModelDraw()
 void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 {
 	Graphics gr(RECT->hDC);
-	Bitmap bmp(RECT->rcItem.right, RECT->rcItem.bottom, &gr);
-	Graphics grBmp(&bmp);
-	grBmp.Clear(Color::White);
-
 	if (_image != nullptr && !_ellipseDrawing)
 	{
 		size_t width = _image[0][0].size();
@@ -38,6 +34,8 @@ void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 		xmax = width;
 		ymin = 0;
 		ymax = height;
+		Bitmap bmpBuffer(width, height);
+
 #pragma omp parallel for
 		for (int i = 0; i < height; i++)
 		{
@@ -45,24 +43,25 @@ void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 			{
 				double val = _image[0][i][j];
 				Color color;
-				color = Color::MakeARGB(255 - val, 0, 0, 0);
-				SolidBrush brush(color);
-				grBmp.FillRectangle(&brush, X(RECT, j), Y(RECT, i), Width(RECT, 1), Height(RECT, 1));
+				color = Color::MakeARGB(255, val, val, val);
+				bmpBuffer.SetPixel(j, height -1 - i, color);
 			}
 		}
-
-		_bmpSpect = bmp.Clone(0, 0, bmp.GetWidth(), bmp.GetHeight(), PixelFormatDontCare);
-		gr.DrawImage(&bmp, 0, 0);
+		Rect rect(0, 0, RECT->rcItem.right, RECT->rcItem.bottom);
+		_bmpSpect = bmpBuffer.Clone(0, 0, bmpBuffer.GetWidth(), bmpBuffer.GetHeight(), PixelFormatDontCare);
+		gr.DrawImage(&bmpBuffer, rect);
 	}
 
 	if (_R != nullptr && _ellipseDrawing)
 	{
+		Rect rect(0, 0, RECT->rcItem.right, RECT->rcItem.bottom);
 		Bitmap *bmpR= _bmpSpect->Clone(0, 0, _bmpSpect->GetWidth(), _bmpSpect->GetHeight(), PixelFormatDontCare);
 		Graphics grBmpR(bmpR);
+		xmax = bmpR->GetWidth();
+		ymax = bmpR->GetHeight();
 		Pen pen(Color::Red, 2);
-		grBmpR.DrawEllipse(&pen, X(RECT, xmax / 2.f - (double)*_R+0.5), Y(RECT, ymax / 2.f + (double)*_R-0.5),
-			Width(RECT, (float)*_R*2.f), Height(RECT, (float)*_R*2.f));
-		gr.DrawImage(bmpR, 0, 0);
+		grBmpR.DrawEllipse(&pen, xmax / 2.f- *_R-0.5, ymax / 2.f - *_R-0.5, *_R*2.f, *_R*2.f);
+		gr.DrawImage(bmpR, rect);
 	}
 	
 }
@@ -90,5 +89,5 @@ REAL CModelDraw::Height(LPDRAWITEMSTRUCT RECT, float height)
 
 void CModelDraw::Update()
 {
-	Invalidate();
+	RedrawWindow();
 }
