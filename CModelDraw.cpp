@@ -59,8 +59,8 @@ void CModelDraw::DrawItem(LPDRAWITEMSTRUCT RECT)
 		Graphics grBmpR(bmpR);
 		xmax = bmpR->GetWidth();
 		ymax = bmpR->GetHeight();
-		Pen pen(Color::Red, 2);
-		grBmpR.DrawEllipse(&pen, xmax / 2.f- *_R-0.5, ymax / 2.f - *_R-0.5, *_R*2.f, *_R*2.f);
+		Pen pen(Color::Red, 1);
+		grBmpR.DrawEllipse(&pen, xmax / 2.f- *_R, ymax / 2.f - *_R-1, *_R*2.f, *_R*2.f);
 		gr.DrawImage(bmpR, rect);
 	}
 	
